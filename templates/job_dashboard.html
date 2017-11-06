@@ -1,0 +1,57 @@
+{% extends'header.html' %}
+{% block body %}
+<title>DashBoard</title>
+<script src="{{url_for('static',filename='js/excel-bootstrap-table-filter-bundle.js')}}"></script>
+<link rel="stylesheet" href="{{url_for('static',filename='css/excel-bootstrap-table-filter-style.css')}}">
+
+</head>
+<body>
+{% include 'navbar.html' %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-warning alert-dismissable" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+    </button>
+    {{message}}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+{% if pagination %}
+<div class="table-responsive" align="center" style="min-height: 100%">
+    {{ pagination.links }}
+    {{pagination.info}}
+    <table class="table table-bordred table-striped">
+        <thead>
+        <tr>
+            <th>title</th>
+            <th>teaser</th>
+            <th>bulletPoints</th>
+            <th> workType</th>
+            <th> subClassification</th>
+            <th> listingDate</th>
+            <th> salary</th>
+        </thead>
+        <tbody>
+        {% for r in res %}
+        <tr>
+            <td><a href="https://www.seek.com.au/job/{{r.id}}">{{ r.title}}</a></td>
+            <td>{{ r.teaser }}</td>
+            <td>{{ r.bulletPoints }}</td>
+            <td>{{ session["workType"][r.workType][0] }}</td>
+            <td>{{ session["subClass"][r.subClassification][0] }}</td>
+            <td>{{ r.listingDate }}</td>
+            <td>{{r.salary}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {{ pagination.links }}
+</div>
+<script>    $('table').excelTableFilter();
+</script>
+{% endif %}
+</body>
+</html>
+{% endblock %}

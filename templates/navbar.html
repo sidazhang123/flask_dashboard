@@ -1,0 +1,38 @@
+<nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <a class="navbar-brand" href="job_dashboard">DashBoard</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+
+            <li class="nav-item {% if session.cur_location == 'job_listing' %}active{% endif %}">
+                <a class="nav-link" href="job_dashboard/job_listing">Listing {% if session.cur_location == 'job_listing'
+                    %}<span class="sr-only">(current)</span>{% endif %}</a>
+            </li>
+            <li class="nav-item {% if session.cur_location == 'job_listing' %}active{% endif %}">
+                <a class="nav-link" href="#">Link{% if session.cur_location == 'job_listing' %}<span class="sr-only">(current)</span>{%
+                    endif %}</a>
+            </li>
+            <li class="nav-item {% if session.cur_location == 'job_listing' %}active{% endif %}">
+                <a class="nav-link disabled" href="#">Disabled{% if session.cur_location == 'job_listing' %}<span
+                        class="sr-only">(current)</span>{% endif %}</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <select class="form-control mr-sm-1">
+                <option value="one">One</option>
+                <option value="two">Two</option>
+                <option value="three">Three</option>
+                <option value="four">Four</option>
+                <option value="five">Five</option>
+            </select>
+            <input class="form-control mr-sm-1" type="text" placeholder="Search">
+            <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
+</nav>
