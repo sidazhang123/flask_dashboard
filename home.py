@@ -108,7 +108,7 @@ def logout():
 
 @app.route('/job_dashboard')
 @app.route('/job_dashboard/<indicator>')
-# @login_required
+@login_required
 def job_dashboard(indicator=None):
     session["cur_location"] = indicator
     if not indicator:
@@ -121,17 +121,17 @@ def job_dashboard(indicator=None):
 @app.route('/job_listing', defaults={'page': 1})
 @app.route('/job_listing/page/<int:page>/')
 @app.route('/job_listing/page/<int:page>')
-# @login_required
+@login_required
 def job_listing(page):
     job = Job_obj.Job_search()
     page, per_page, offset = get_page_args(page_parameter='page',
                                            per_page_parameter='per_page')
     if page == 1:
-        res, fk1, fk2 = job.find(offset, per_page, True)
+        res,graph_data, fk1, fk2 = job.find(offset, per_page, True)
         session["workType"] = fk1
         session["subClass"] = fk2
     else:
-        res = job.find(offset, per_page, False)
+        res,graph_data = job.find(offset, per_page, False)
     pagination = Pagination(page=page, per_page=per_page, total=job.total, record_name='search_res', format_total=True,
                             format_number=True)
 
@@ -139,6 +139,7 @@ def job_listing(page):
                            res=res,
                            per_page=per_page,
                            pagination=pagination,
+                           graph = graph_data
                            )
 
 

@@ -3,7 +3,58 @@
 <title>DashBoard</title>
 <script src="{{url_for('static',filename='js/excel-bootstrap-table-filter-bundle.js')}}"></script>
 <link rel="stylesheet" href="{{url_for('static',filename='css/excel-bootstrap-table-filter-style.css')}}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+<script type="text/javascript">
+    function localize(t) {
+        var d = new Date(t + " UTC");
+        document.write(d.toString().replace(/GMT.*/g, ""));
+    }
+</script>
+<script type="text/javascript">
+    function show_graph() {
 
+        $('#graph').show();
+        var container = document.getElementById('visualization');
+//        var data = ${sessionScope.graph};
+//        window.alert(data[0])
+        var items = [
+        { % for i in graph %
+    }
+        {
+            '{{i[1]}}', y;
+        :
+            {
+                {
+                    i[0]
+                }
+            }
+        ,
+            0
+        }
+    ,
+        {%
+            endfor %
+        }
+    ]
+        var groups = new vis.DataSet();
+        groups.add({
+            id: 0,
+            className: 'custom-style2',
+            options: {
+                style: 'bar',
+                drawPoints: {
+                    style: 'circle',
+                    size: 10
+                }
+            }
+        });
+        var dataset = new vis.DataSet(items);
+        var options = {start: "{{graph[0][1]}}", end: "{{graph[-1][1]}}", moveable: false, zoomable: false};
+        var graph2d = new vis.Graph2d(container, dataset, groups, options);
+    }
+
+</script>
 </head>
 <body>
 {% include 'navbar.html' %}
@@ -19,9 +70,15 @@
 {% endif %}
 {% endwith %}
 {% if pagination %}
+
+<div class="overlay" id="graph">
+    <div id="visualization"></div>
+
+</div>
 <div class="table-responsive" align="center" style="min-height: 100%">
     {{ pagination.links }}
     {{pagination.info}}
+    <button id="graph_btn" onclick="show_graph()">Graph</button>
     <table class="table table-bordred table-striped">
         <thead>
         <tr>
@@ -35,13 +92,16 @@
         </thead>
         <tbody>
         {% for r in res %}
+
         <tr>
             <td><a href="https://www.seek.com.au/job/{{r.id}}">{{ r.title}}</a></td>
             <td>{{ r.teaser }}</td>
             <td>{{ r.bulletPoints }}</td>
             <td>{{ session["workType"][r.workType][0] }}</td>
             <td>{{ session["subClass"][r.subClassification][0] }}</td>
-            <td>{{ r.listingDate }}</td>
+            <td>
+                <script>localize("{{r.listingDate}}");</script>
+            </td>
             <td>{{r.salary}}</td>
         </tr>
         {% endfor %}
@@ -49,7 +109,9 @@
     </table>
     {{ pagination.links }}
 </div>
-<script>    $('table').excelTableFilter();
+<script>
+
+    $('table').excelTableFilter();
 </script>
 {% endif %}
 </body>

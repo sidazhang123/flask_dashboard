@@ -3,7 +3,7 @@ import certifi
 import json
 import conn
 from datetime import datetime
-from apscheduler.schedulers.blocking import BlockingScheduler
+
 
 
 # Grab Sydney ICT job info in a specified range of time from api of seek.com.au.
@@ -43,19 +43,27 @@ class Job:
 
         http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
         r = http.request('GET', self.url + page_id)
+        print("grab")
         return json.loads(r.data.decode('utf-8'))
 
-    def parse_and_save_db(self, json, in_days):
+    def parse_and_save_db(self, json, in_hours):
+        print("parse")
         col_names = ','.join(self.interested_field)
-        now = datetime.now()
+        now = datetime.utcnow()
         insert_vars = []
-
+        self.cursor.execute("SELECT MAX(listingDate) from jobs")
+        latest_record = self.cursor.fetchone()[0]
+        print(len(json['data']))
         for job in json['data']:
             listing_date = job['listingDate'].replace('T', ' ').replace('Z', '')
-            day_diff = (now - datetime.strptime(listing_date, '%Y-%m-%d %H:%M:%S')).days
+
+            hour_diff = (now - datetime.strptime(listing_date, '%Y-%m-%d %H:%M:%S')).total_seconds()/3600
+            print(hour_diff)
             # Halt when listingDate exceeds designated time range
-            if day_diff >= in_days and str(job['isPremium']) == 'False':
+            if hour_diff >= in_hours and str(job['isPremium']) == 'False':
                 return False
+            if datetime.strptime(listing_date, '%Y-%m-%d %H:%M:%S')<= latest_record:
+                continue
             # Format raw data
             for i in self.interested_field:
                 if i not in self.fk_tables.keys():
@@ -97,18 +105,16 @@ class Job:
         self.cnx.commit()
         return True
 
-    def page_turning(self, in_days=1):
+    def page_turning(self, in_hours=2):
         page = 0
         ret = 'continue'
         while ret:
             page += 1
             page_json = self.grab_page(str(page))
-            ret = self.parse_and_save_db(page_json, in_days)
+            ret = self.parse_and_save_db(page_json, in_hours)
 
 
 if __name__ == '__main__':
     job = Job()
     job.page_turning(10)
-    # scheduler = BlockingScheduler()
-    # scheduler.add_job(job.page_turning(10), 'interval', minutes=20)
-    # scheduler.start()
+    # job.page_turning(30*24)
