@@ -11,50 +11,7 @@
         document.write(d.toString().replace(/GMT.*/g, ""));
     }
 </script>
-<script type="text/javascript">
-    function show_graph() {
 
-        $('#graph').show();
-        var container = document.getElementById('visualization');
-//        var data = ${sessionScope.graph};
-//        window.alert(data[0])
-        var items = [
-        { % for i in graph %
-    }
-        {
-            '{{i[1]}}', y;
-        :
-            {
-                {
-                    i[0]
-                }
-            }
-        ,
-            0
-        }
-    ,
-        {%
-            endfor %
-        }
-    ]
-        var groups = new vis.DataSet();
-        groups.add({
-            id: 0,
-            className: 'custom-style2',
-            options: {
-                style: 'bar',
-                drawPoints: {
-                    style: 'circle',
-                    size: 10
-                }
-            }
-        });
-        var dataset = new vis.DataSet(items);
-        var options = {start: "{{graph[0][1]}}", end: "{{graph[-1][1]}}", moveable: false, zoomable: false};
-        var graph2d = new vis.Graph2d(container, dataset, groups, options);
-    }
-
-</script>
 </head>
 <body>
 {% include 'navbar.html' %}
@@ -71,14 +28,46 @@
 {% endwith %}
 {% if pagination %}
 
-<div class="overlay" id="graph">
-    <div id="visualization"></div>
 
-</div>
+<div id="visualization"></div>
+        <script type="text/javascript">
+        function show_graph() {
+            var container = document.getElementById('visualization');
+            var items = [
+            {% for i in graph_data %}
+            {'{{i[1]}}', y;:{{i[0]}},0},
+            {% endfor %}
+        ]
+            var groups = new vis.DataSet();
+            groups.add({
+                id: 0,
+                className: 'custom-style2',
+                options: {
+                    style: 'bar',
+                    drawPoints: {
+                        style: 'circle',
+                        size: 10
+                    }
+                }
+            });
+            var dataset = new vis.DataSet(items);
+            var options = {
+                start: "{{graph_data[0][1]}}",
+                end: "{{graph_data[-1][1]}}",
+                moveable: false,
+                zoomable: false
+            };
+            var graph2d = new vis.Graph2d(container, dataset, groups, options);
+        }
+
+</script>
+
+
 <div class="table-responsive" align="center" style="min-height: 100%">
     {{ pagination.links }}
     {{pagination.info}}
-    <button id="graph_btn" onclick="show_graph()">Graph</button>
+    <button onclick="show_graph()">Graph</button>
+
     <table class="table table-bordred table-striped">
         <thead>
         <tr>

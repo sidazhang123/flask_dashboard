@@ -27,9 +27,9 @@ class Job_search:
 
         ks = ["id", "title", "teaser", "bulletPoints", "workType", "subClassification", "listingDate", "salary"]
         if q:
-            self.cursor.execute("SELECT workType FROM workType")
+            self.cursor.execute("SELECT workType FROM worktype")
             fk1 = self.cursor.fetchall()
-            self.cursor.execute("SELECT subClassification FROM subClassification")
+            self.cursor.execute("SELECT subClassification FROM subclassification")
             fk2 = self.cursor.fetchall()
             return [dict(zip(ks, d)) for d in row],self.graph_data, fk1, fk2
         else:

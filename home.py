@@ -7,8 +7,8 @@ from passlib.hash import sha256_crypt
 import gc, os
 from job import Job_obj
 
-app = Flask(__name__, instance_path='C:/Users/pkwcc/PycharmProjects/flask/protected')
-
+app = Flask(__name__, instance_path='/home/pkwccheng/flask_dashboard/protected')
+app.secret_key="super secret key"
 
 @app.route('/robots.txt')
 def robots():
@@ -69,7 +69,7 @@ def login():
                 cursor.close()
                 conn.close()
                 gc.collect()
-                session['login'] = True
+                session['login'] = "good"
                 session['username'] = request.form['username']
                 flash('LoggedIn')
                 return jsonify({'url': url_for(row[3])})
@@ -87,10 +87,12 @@ def login_required(f):
     def wrap(*args, **kwargs):
         try:
             if session['login']:
+                print("logined")
                 return f(*args, **kwargs)
             else:
                 raise Exception
-        except:
+        except Exception as e:
+            print(e)
             flash('Login first')
             return redirect(url_for('index'))
 
@@ -114,7 +116,7 @@ def job_dashboard(indicator=None):
     if not indicator:
         return render_template("job_dashboard.html")
     if indicator == "job_listing":
-        return redirect(url_for("job_listing"))
+        return redirect(url_for("download"))
 
 
 @app.route('/job_listing/', defaults={'page': 1})
@@ -123,6 +125,7 @@ def job_dashboard(indicator=None):
 @app.route('/job_listing/page/<int:page>')
 @login_required
 def job_listing(page):
+
     job = Job_obj.Job_search()
     page, per_page, offset = get_page_args(page_parameter='page',
                                            per_page_parameter='per_page')
@@ -139,7 +142,7 @@ def job_listing(page):
                            res=res,
                            per_page=per_page,
                            pagination=pagination,
-                           graph = graph_data
+                           graph_data=graph_data
                            )
 
 
